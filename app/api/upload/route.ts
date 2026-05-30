@@ -13,10 +13,24 @@ const ALLOWED_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 
+const getExtension = (fileName: string): string =>
+  fileName.split(".").pop()?.toLowerCase() ?? "";
+
 const isAllowed = (file: File): boolean => {
   if (ALLOWED_TYPES.has(file.type)) return true;
-  const extension = file.name.split(".").pop()?.toLowerCase();
+  const extension = getExtension(file.name);
   return extension === "pdf" || extension === "doc" || extension === "docx";
+};
+
+const toMimeType = (file: File): string => {
+  if (file.type) return file.type;
+  const extension = getExtension(file.name);
+  if (extension === "pdf") return "application/pdf";
+  if (extension === "doc") return "application/msword";
+  if (extension === "docx") {
+    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  }
+  return "";
 };
 
 export async function POST(request: NextRequest) {
@@ -70,7 +84,7 @@ export async function POST(request: NextRequest) {
         );
       }
       const jdBuffer = Buffer.from(await jdFile.arrayBuffer());
-      const jdResult = await extractTextFromBuffer(jdBuffer, jdFile.type);
+      const jdResult = await extractTextFromBuffer(jdBuffer, toMimeType(jdFile));
       jdText = jdResult.text;
     }
 
@@ -91,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     for (const file of files) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const parsed = await extractTextFromBuffer(buffer, file.type);
+      const parsed = await extractTextFromBuffer(buffer, toMimeType(file));
       const nameFromFile = file.name.replace(/\.[^/.]+$/, "").trim() || "Unknown";
 
       const candidate = await prisma.candidate.create({

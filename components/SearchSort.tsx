@@ -27,7 +27,7 @@ export default function SearchSort({
         <button
           type="button"
           onClick={() => onSortChange("score")}
-          className={`rounded-md border px-3 py-1.5 ${
+          className={`rounded-md border px-3 py-1.5 cursor-pointer ${
             sortOrder === "score"
               ? "border-[#6366f1] text-[#e5e5e5]"
               : "border-[#1f1f1f] text-[#6b7280]"
@@ -38,7 +38,7 @@ export default function SearchSort({
         <button
           type="button"
           onClick={() => onSortChange("name")}
-          className={`rounded-md border px-3 py-1.5 ${
+          className={`rounded-md border px-3 py-1.5 cursor-pointer ${
             sortOrder === "name"
               ? "border-[#6366f1] text-[#e5e5e5]"
               : "border-[#1f1f1f] text-[#6b7280]"

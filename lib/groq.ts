@@ -61,6 +61,15 @@ const isGenericName = (name: string): boolean => {
   );
 };
 
+const normalizeSummaryName = (summary: string, name: string): string => {
+  const cleaned = summary.trim();
+  if (!cleaned) return cleaned;
+  return cleaned
+    .replace(/\bJohn Doe\b/gi, name)
+    .replace(/\bJane Doe\b/gi, name)
+    .replace(/\bCandidate\b/gi, name);
+};
+
 export const scoreResume = async (
   jdText: string,
   resumeText: string,
@@ -88,8 +97,10 @@ export const scoreResume = async (
     try {
       const parsed = JSON.parse(content) as ScoreResult;
       const fallbackName = defaultNameFromFile(fileName);
+      const resolvedName =
+        parsed.name && !isGenericName(parsed.name) ? parsed.name : fallbackName;
       return {
-        name: parsed.name && !isGenericName(parsed.name) ? parsed.name : fallbackName,
+        name: resolvedName,
         score: Number.isFinite(parsed.score) ? Math.round(parsed.score) : 0,
         matchedSkills: Array.isArray(parsed.matchedSkills)
           ? parsed.matchedSkills
@@ -97,7 +108,7 @@ export const scoreResume = async (
         missingSkills: Array.isArray(parsed.missingSkills)
           ? parsed.missingSkills
           : [],
-        summary: parsed.summary || "",
+        summary: normalizeSummaryName(parsed.summary || "", resolvedName),
       };
     } catch {
       return defaultResult(fileName, "Scoring failed — invalid response");

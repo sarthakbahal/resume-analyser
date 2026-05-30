@@ -50,13 +50,13 @@ export default function ResultsView({
           <div className="flex items-center gap-3">
             <a
               href={`/api/export?sessionId=${sessionId}`}
-              className="rounded-md border border-[#1f1f1f] px-3 py-1.5 text-xs text-[#e5e5e5] hover:border-[#6366f1]"
+              className="cursor-pointer rounded-md border border-[#1f1f1f] px-3 py-1.5 text-xs text-[#e5e5e5] hover:border-[#6366f1]"
             >
               Export CSV
             </a>
             <Link
               href="/"
-              className="rounded-md bg-[#6366f1] px-3 py-1.5 text-xs font-medium text-white"
+              className="cursor-pointer rounded-md bg-[#6366f1] px-3 py-1.5 text-xs font-medium text-white"
             >
               New Analysis
             </Link>

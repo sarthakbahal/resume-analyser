@@ -29,7 +29,7 @@ export default function JDInput({
           onClick={() => onModeChange("text")}
           className={`pb-1 border-b-2 ${
             mode === "text" ? "border-[#6366f1] text-[#e5e5e5]" : "border-transparent text-[#6b7280]"
-          }`}
+          } cursor-pointer`}
         >
           Type JD
         </button>
@@ -38,7 +38,7 @@ export default function JDInput({
           onClick={() => onModeChange("file")}
           className={`pb-1 border-b-2 ${
             mode === "file" ? "border-[#6366f1] text-[#e5e5e5]" : "border-transparent text-[#6b7280]"
-          }`}
+          } cursor-pointer`}
         >
           Upload JD
         </button>

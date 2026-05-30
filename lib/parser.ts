@@ -17,7 +17,7 @@ export const extractTextFromBuffer = async (
   mimeType: string
 ): Promise<ParsedFile> => {
   try {
-    if (mimeType === "application/pdf") {
+    if (mimeType === "application/pdf" || mimeType === "pdf") {
       const pdfModule = (await import("pdf-parse")) as {
         PDFParse: PDFParseConstructor;
       };
@@ -29,7 +29,9 @@ export const extractTextFromBuffer = async (
 
     if (
       mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      mimeType === "application/msword"
+      mimeType === "application/msword" ||
+      mimeType === "docx" ||
+      mimeType === "doc"
     ) {
       const result = await mammoth.extractRawText({ buffer });
       return { text: normalizeText(result.value ?? "") };

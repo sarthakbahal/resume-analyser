@@ -170,7 +170,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => removeResume(index)}
-                  className="text-xs text-[#ef4444]"
+                  className="cursor-pointer text-xs text-[#ef4444]"
                 >
                   Remove
                 </button>
@@ -185,7 +185,7 @@ export default function HomePage() {
                   behavior: "smooth",
                 })
               }
-              className="text-xs text-[#6366f1]"
+              className="cursor-pointer text-xs text-[#6366f1]"
             >
               Continue →
             </button>
@@ -207,7 +207,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={handleAnalyze}
-            className="w-full rounded-md bg-[#6366f1] px-4 py-2 text-sm font-medium text-white"
+            className="w-full cursor-pointer rounded-md bg-[#6366f1] px-4 py-2 text-sm font-medium text-white"
           >
             Analyze Candidates
           </button>
