@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id         String      @id @default(cuid())
+  jdText     String
+  createdAt  DateTime    @default(now())
+  candidates Candidate[]
+}
+
+model Candidate {
+  id            String      @id @default(cuid())
+  sessionId     String
+  name          String
+  fileName      String
+  resumeText    String
+  score         Int
+  rank          Int
+  matchedSkills String[]
+  missingSkills String[]
+  summary       String
+  createdAt     DateTime    @default(now())
+  session       Session     @relation(fields: [sessionId], references: [id])
+  upload        FileUpload?
+}
+
+model FileUpload {
+  id           String    @id @default(cuid())
+  candidateId  String    @unique
+  originalName String
+  mimeType     String
+  size         Int
+  candidate    Candidate @relation(fields: [candidateId], references: [id])
+}

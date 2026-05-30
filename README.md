@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Screening & Candidate Ranking
 
-## Getting Started
+Production-ready internal tool that ingests resumes and a job description, scores candidates with Groq, and returns a ranked dashboard with CSV export.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Upload up to 20 resumes (PDF, DOC, DOCX)
+- Type or upload a job description
+- LLM scoring with structured output
+- Ranked results dashboard with search + sorting
+- CSV export of results
+- Safe error handling (batch continues on per-candidate failures)
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- Tailwind CSS
+- Prisma + PostgreSQL
+- Groq API (llama-3.1-8b-instant)
+- pdf-parse + mammoth for parsing
+- papaparse for CSV export
+
+## Setup
+
+1. Copy the environment file and set values.
+
+```
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Initialize Prisma and the database.
 
-## Learn More
+```
+npx prisma migrate dev --name init
+npx prisma generate
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Start the dev server.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open http://localhost:3000
 
-## Deploy on Vercel
+## Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Required variables in .env:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- DATABASE_URL
+- GROQ_API_KEY
+- NEXT_PUBLIC_APP_URL
+
+## Usage
+
+1. Upload resumes (PDF, DOC, DOCX) on Step 1.
+2. Provide a job description (type or upload).
+3. Click “Analyze Candidates”.
+4. Review the ranked results and export CSV if needed.
+
+## API Endpoints
+
+### POST /api/upload
+
+Accepts multipart/form-data with fields:
+
+- files (multiple resume files)
+- jdText (string)
+- jdFile (optional, PDF/DOC/DOCX)
+
+Creates a new session and candidates in the database.
+
+### POST /api/analyze
+
+Body:
+
+```
+{ "sessionId": "..." }
+```
+
+Scores all candidates for the session, updates rank, and returns sorted results.
+
+### GET /api/export?sessionId=...
+
+Returns a CSV export of ranked results.
+
+## Limits & Constraints
+
+- Max file size: 5MB per resume/JD
+- Max resumes: 20
+- Unsupported formats are rejected
+
+## Troubleshooting
+
+- If parsing fails for a resume or JD, the system stores an empty string and continues.
+- If Groq scoring fails, the candidate is returned with score 0 and a failure summary.
+- Ensure your PostgreSQL database is reachable from the DATABASE_URL.
+
+## Scripts
+
+- npm run dev — start development server
+- npm run lint — run linting
