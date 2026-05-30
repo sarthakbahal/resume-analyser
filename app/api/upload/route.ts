@@ -87,48 +87,42 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const candidates = await prisma.$transaction(async (tx: typeof prisma) => {
-      const created: Array<{ id: string }> = [];
+    let createdCount = 0;
 
-      for (const file of files) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const parsed = await extractTextFromBuffer(buffer, file.type);
-        const nameFromFile = file.name.replace(/\.[^/.]+$/, "").trim() || "Unknown";
+    for (const file of files) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const parsed = await extractTextFromBuffer(buffer, file.type);
+      const nameFromFile = file.name.replace(/\.[^/.]+$/, "").trim() || "Unknown";
 
-        const candidate = await tx.candidate.create({
-          data: {
-            sessionId: session.id,
-            name: nameFromFile,
-            fileName: file.name,
-            resumeText: parsed.text,
-            score: 0,
-            rank: 0,
-            matchedSkills: [],
-            missingSkills: [],
-            summary: "",
-          },
-        });
-
-        await tx.fileUpload.create({
-          data: {
-            candidateId: candidate.id,
-            originalName: file.name,
-            mimeType: file.type,
-            size: file.size,
-          },
-        });
-
-        created.push({ id: candidate.id });
-      }
-
-      return tx.candidate.findMany({
-        where: { id: { in: created.map((c) => c.id) } },
+      const candidate = await prisma.candidate.create({
+        data: {
+          sessionId: session.id,
+          name: nameFromFile,
+          fileName: file.name,
+          resumeText: parsed.text,
+          score: 0,
+          rank: 0,
+          matchedSkills: [],
+          missingSkills: [],
+          summary: "",
+        },
       });
-    });
+
+      await prisma.fileUpload.create({
+        data: {
+          candidateId: candidate.id,
+          originalName: file.name,
+          mimeType: file.type,
+          size: file.size,
+        },
+      });
+
+      createdCount += 1;
+    }
 
     return NextResponse.json({
       sessionId: session.id,
-      candidateCount: candidates.length,
+      candidateCount: createdCount,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Upload failed.";
